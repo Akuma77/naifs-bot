@@ -1,6 +1,9 @@
-import os, asyncio
+# main.py
+import os
+import asyncio
 from dotenv import load_dotenv
 load_dotenv()
+
 import discord
 from discord.ext import commands
 import logging
@@ -15,13 +18,20 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 @bot.event
 async def on_ready():
     print(f"✅ Naifs Bot logged in as {bot.user}")
-    # cogs-ийг ачаална
+
+async def load_all_extensions():
+    # cogs-уудыг энд ачаална 
+    # cogs/helpcenter.py, cogs/games_and_economy.py 
     await bot.load_extension("cogs.helpcenter")
     await bot.load_extension("cogs.games_and_economy")
     print("Cogs loaded.")
 
-if __name__ == "__main__":
+async def main():
     token = os.getenv("BOT_TOKEN")
     if not token:
         raise SystemExit("BOT_TOKEN not found in .env")
-    asyncio.run(bot.start(token))
+    await load_all_extensions()
+    await bot.start(token)
+
+if __name__ == "__main__":
+    asyncio.run(main())
