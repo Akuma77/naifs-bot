@@ -1,3 +1,4 @@
+
 import json
 import os
 
@@ -25,11 +26,18 @@ def create_user(user_id):
         return False  # аль хэдийн бүртгэлтэй
 
     db[str(user_id)] = {
-        "moonstone": 5000,   # шинэ тоглогч
+        "moonstone": 5000,   # шинэ тоглогч wallet-д (төвч: moon)
         "exp": 0,
         "level": 0,
-        "wallet_limit": 0,
-        "bank": 0
+        "bank": 0,
+        # cooldown талбарууд (ISO дататай)
+        "last_daily": None,
+        "last_slot": None,
+        "last_roulette": None,
+        "last_raid": None,
+        "last_robbank": None,
+        "last_action": None,
+        "username": None
     }
 
     save_db(db)
@@ -41,11 +49,21 @@ def get_user(user_id):
     return db.get(str(user_id), None)
 
 def update_user(user_id, key, value):
-    """Утга шинэчлэх."""
+    """Тодорхой property-г шинэчлэх (set)."""
     db = load_db()
     if str(user_id) not in db:
         return False
 
     db[str(user_id)][key] = value
+    save_db(db)
+    return True
+
+def inc_user(user_id, key, amount):
+    """Тоо нэмэх/хасах (increment)."""
+    db = load_db()
+    if str(user_id) not in db:
+        return False
+    db[str(user_id)].setdefault(key, 0)
+    db[str(user_id)][key] = db[str(user_id)].get(key, 0) + amount
     save_db(db)
     return True
